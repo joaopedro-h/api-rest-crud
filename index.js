@@ -34,10 +34,29 @@ function checkIndexCurso(req, res, next) {
 
 // =========================================
 // GET - Lista todos os cursos cadastrados.
+//
+// Query Params (Opcional):
+// localhost:3000/cursos?name=JavaScript (Exemplo de busca)
+//
+// Se nenhum parâmetro for informado, retorna todos os cursos.
+//
+// Caso seja informado um nome, retorna apenas o curso pesquisado.
 // =========================================
 server.get("/cursos", (req, res) => {
 
-    return res.json(cursos);
+    const {name} = req.query;
+
+    if (!name) {
+        return res.json(cursos);
+    }
+
+    const curso = cursos.find(curso => curso.toLocaleLowerCase() === name.toLocaleLowerCase());
+
+    if (!curso) {
+        return res.status(404).json({error: "Curso não encontrado!"});
+    }
+
+    return res.json(curso);
 });
 
 
@@ -49,7 +68,7 @@ server.get("/cursos", (req, res) => {
 // ===================================
 server.get("/cursos/:index", checkIndexCurso, (req, res) => {
 
-    const { index } = req.params;
+    const {index} = req.params;
 
     return res.json(cursos[index]);
 });
@@ -65,7 +84,7 @@ server.get("/cursos/:index", checkIndexCurso, (req, res) => {
 // ==========================================
 server.post("/cursos", checkNameCurso, (req, res) => {
 
-    const { name } = req.body;
+    const {name} = req.body;
 
     cursos.push(name);
 
@@ -86,8 +105,8 @@ server.post("/cursos", checkNameCurso, (req, res) => {
 // ==========================================
 server.put("/cursos/:index", checkNameCurso, checkIndexCurso, (req, res) => {
 
-    const { index } = req.params;
-    const { name } = req.body;
+    const {index} = req.params;
+    const {name} = req.body;
 
     cursos[index] = name;
 
@@ -103,7 +122,7 @@ server.put("/cursos/:index", checkNameCurso, checkIndexCurso, (req, res) => {
 // ==========================================
 server.delete("/cursos/:index", checkIndexCurso, (req, res) => {  
 
-    const { index } = req.params;                      
+    const {index} = req.params;                      
 
     cursos.splice(index, 1);
 
